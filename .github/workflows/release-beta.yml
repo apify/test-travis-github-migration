@@ -45,7 +45,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: node-modules-14-${{ env.GITHUB_RUN_ID }}
+          key: node-modules-${{ github.run_id }}-v14
       - run: npm run lint
 
 
@@ -67,7 +67,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: node-modules-${{ matrix.node-version }}-${{ env.GITHUB_RUN_ID }}
+          key: node-modules-${{ github.run_id }}-v${{ matrix.node-version }}
       - run: npm test
 
   publish-npm:
