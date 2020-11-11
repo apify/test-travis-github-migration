@@ -1,5 +1,5 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# This workflow runs for every pull request to lint and test the proposed changes.
+# NPM install is done in a separate job and cached to speed up the following jobs.
 
 name: Check
 
@@ -27,7 +27,7 @@ jobs:
         key: node-modules-${{ matrix.node-version }}-${{ env.GITHUB_RUN_ID }}
     - name: Install Dependencies
       run: npm install
-  
+
   lint:
     needs: [install]
     runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
         key: node-modules-14-${{ env.GITHUB_RUN_ID }}
     - run: npm run lint
 
-      
+
   test:
     needs: [install]
     runs-on: ubuntu-latest
