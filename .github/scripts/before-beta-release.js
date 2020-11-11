@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const { execSync } = require('child_process');
 
-const PKG_JSON_PATH = path.join(__dirname, '..', 'package.json');
+const PKG_JSON_PATH = path.join(__dirname, '..', '..', 'package.json');
 
 const pkgJson = require(PKG_JSON_PATH);
 
