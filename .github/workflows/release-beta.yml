@@ -27,7 +27,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: node-modules-${{ matrix.node-version }}-${{ env.GITHUB_RUN_ID }}
+          key: node-modules-${{ github.run_id }}-v${{ matrix.node-version }}
       - name: Install Dependencies
         run: npm install
 
