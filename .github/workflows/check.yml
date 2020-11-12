@@ -1,5 +1,4 @@
 # This workflow runs for every pull request to lint and test the proposed changes.
-# NPM install is done in a separate job and cached to speed up the following jobs.
 
 name: Check
 
@@ -7,6 +6,7 @@ on:
   pull_request:
 
 jobs:
+  # NPM install is done in a separate job and cached to speed up the following jobs.
   install:
     runs-on: ubuntu-latest
 
@@ -48,7 +48,6 @@ jobs:
           build
         key: node-modules-${{ github.run_id }}-v14
     - run: npm run lint
-
 
   test:
     needs: [install]

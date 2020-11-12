@@ -1,12 +1,11 @@
-# This workflow runs for every push to master to lint and test the changes.
-# If the checks are successful, the code is released as a new beta version.
+# This workflow runs when a release is published on GitHub.
+# If the checks are successful, the code is released as a new latest version.
 
-name: Check & Release Beta
+name: Check & Release Latest
 
 on:
-  push:
-    branches:
-      - master
+  release:
+    types: [ published ]
 
 jobs:
   # NPM install is done in a separate job and cached to speed up the following jobs.
@@ -90,11 +89,8 @@ jobs:
         with:
           path: |
             node_modules
-            build
+             build
           key: node-modules-${{ github.run_id }}-v${{ matrix.node-version }}
-        # Check version consistency and increment pre-release version number.
-      - name: pre-release
-        run: node ./.github/scripts/before-beta-release.js
-      - run: npm publish --tag beta
+      - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
