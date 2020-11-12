@@ -23,7 +23,9 @@ jobs:
     - name: Cache Node Modules
       uses: actions/cache@v2
       with:
-        path: node_modules
+        path: |
+          node_modules
+          build
         key: node-modules-${{ github.run_id }}-v${{ matrix.node-version }}
     - name: Install Dependencies
       run: npm install
@@ -41,7 +43,9 @@ jobs:
     - name: Load Cache
       uses: actions/cache@v2
       with:
-        path: node_modules
+        path: |
+          node_modules
+          build
         key: node-modules-${{ github.run_id }}-v14
     - run: npm run lint
 
@@ -63,6 +67,8 @@ jobs:
     - name: Load Cache
       uses: actions/cache@v2
       with:
-        path: node_modules
+        path: |
+          node_modules
+          build
         key: node-modules-${{ github.run_id }}-v${{ matrix.node-version }}
     - run: npm test

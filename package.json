@@ -1,16 +1,21 @@
 {
   "name": "apify-test-travis-github-migration",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Just to test migration of SDK Travis scripts to GitHub Actions. Will delete afterwards.",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "jest",
-    "lint": "eslint ./src ./test"
+    "lint": "eslint ./src ./test",
+    "build": "rm -rf build && cp -R src build",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/apify/test-travis-github-migration.git"
   },
+  "files": [
+    "build"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
