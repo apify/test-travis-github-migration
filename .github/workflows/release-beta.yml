@@ -87,11 +87,11 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: Load Cache
         uses: actions/cache@v2
-          with:
-            path: |
-              node_modules
-              build
-            key: node-modules-${{ github.run_id }}-v${{ matrix.node-version }}
+        with:
+          path: |
+            node_modules
+             build
+          key: node-modules-${{ github.run_id }}-v${{ matrix.node-version }}
       - run: node ./.github/scripts/before-beta-release.js
       - run: npm publish
         env:
