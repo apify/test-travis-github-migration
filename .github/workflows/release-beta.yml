@@ -103,6 +103,12 @@ jobs:
         name: Publish to NPM
         run: NODE_AUTH_TOKEN=${{secrets.NPM_TOKEN}} npm publish --tag beta
       -
+        name: Tag Version
+        run: |
+          git_tag=v`node -p "require('./package.json').version"`
+          git tag $git_tag
+          git push origin $git_tag
+      -
         name: Read Versions For Images
         id: versions
         run: |
