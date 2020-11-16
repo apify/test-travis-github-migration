@@ -123,6 +123,14 @@ jobs:
         if: env.RELEASE_TAG == 'beta'
         run: node ./.github/scripts/before-beta-release.js
       -
+        name: Check Versions For Images
+        id: versions
+        run: |
+          apify=`node -p "require('./package.json').version"`
+          echo "::set-output name=apify::$apify"
+          puppeteer=`node -p "require('./package.json').optionalDependencies.puppeteer"`
+          echo "::set-output name=puppeteer::$puppeteer"
+      -
         name: Publish to NPM
         run: NODE_AUTH_TOKEN=${{secrets.NPM_TOKEN}} npm publish --tag ${{ env.RELEASE_TAG }}
       -
@@ -133,14 +141,6 @@ jobs:
           git_tag=v`node -p "require('./package.json').version"`
           git tag $git_tag
           git push origin $git_tag
-      -
-        name: Read Versions For Images
-        id: versions
-        run: |
-          apify=`node -p "require('./package.json').version"`
-          echo "::set-output name=apify::$apify"
-          puppeteer=`node -p "require('./package.json').optionalDependencies.puppeteer"`
-          echo "::set-output name=puppeteer::$puppeteer"
       -
         name: Trigger Docker Image Build
         uses: peter-evans/repository-dispatch@v1
