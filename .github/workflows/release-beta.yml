@@ -11,7 +11,7 @@ on:
 
 env:
   # Save info whether this is a latest or beta release for later use in jobs
-  RELEASE_TAG: $(if [ ${{ github.event_name }} = release ]; then echo latest; else echo beta; fi)
+  RELEASE_TAG:
 
 jobs:
   # NPM install is done in a separate job and cached to speed up the following jobs.
@@ -115,6 +115,9 @@ jobs:
             node_modules
             build
           key: node-modules-${{ github.run_id }}-v${{ matrix.node-version }}
+      - # Determine if this is a beta or latest release
+        name: Set Release Tag
+        run: echo "RELEASE_TAG=$(if [ ${{ github.event_name }} = release ]; then echo latest; else echo beta; fi)" >> $GITHUB_ENV
       - # Check version consistency and increment pre-release version number for beta only.
         name: Bump pre-release version
         if: env.RELEASE_TAG == 'beta'
