@@ -1,17 +1,13 @@
 name: Check & Release Beta
 
 on:
-  # Push to master will trigger a beta version release
+  # Push to master will deploy a beta version
   push:
     branches:
       - master
-  # A manual release via GitHub releases will trigger latest release
+  # A release via GitHub releases will deploy a latest version
   release:
     types: [ published ]
-
-env:
-  # Save info whether this is a latest or beta release for later use in jobs
-  RELEASE_TAG:
 
 jobs:
   # NPM install is done in a separate job and cached to speed up the following jobs.
@@ -96,6 +92,8 @@ jobs:
       -
         run: npm test
 
+  # The deploy job is long but there are only 2 important parts. NPM publish
+  # and triggering of docker image builds in the apify-actor-docker repo.
   deploy:
     needs: [lint, test]
     runs-on: ubuntu-latest
@@ -115,17 +113,20 @@ jobs:
             node_modules
             build
           key: node-modules-${{ github.run_id }}-v${{ matrix.node-version }}
-      - # Determine if this is a beta or latest release
+      -
+        # Determine if this is a beta or latest release
         name: Set Release Tag
         run: echo "RELEASE_TAG=$(if [ ${{ github.event_name }} = release ]; then echo latest; else echo beta; fi)" >> $GITHUB_ENV
-      - # Check version consistency and increment pre-release version number for beta only.
+      -
+        # Check version consistency and increment pre-release version number for beta only.
         name: Bump pre-release version
         if: env.RELEASE_TAG == 'beta'
         run: node ./.github/scripts/before-beta-release.js
       -
         name: Publish to NPM
         run: NODE_AUTH_TOKEN=${{secrets.NPM_TOKEN}} npm publish --tag ${{ env.RELEASE_TAG }}
-      - # Latest version is tagged by the release process
+      -
+        # Latest version is tagged by the release process so we only tag beta here.
         name: Tag Version
         if: env.RELEASE_TAG == 'beta'
         run: |
@@ -136,9 +137,9 @@ jobs:
         name: Read Versions For Images
         id: versions
         run: |
-          apify=`cat ./package.json | jq '.version'`
+          apify=`node -p "require('./package.json').version"`
           echo "::set-output name=apify::$apify"
-          puppeteer=`cat ./package.json | jq '.optionalDependencies.puppeteer'`
+          puppeteer=`node -p "require('./package.json').optionalDependencies.puppeteer"`
           echo "::set-output name=puppeteer::$puppeteer"
       -
         name: Trigger Docker Image Build
