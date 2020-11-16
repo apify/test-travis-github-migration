@@ -1,12 +1,17 @@
-# This workflow runs for every push to master to lint and test the changes.
-# If the checks are successful, the code is released as a new beta version.
-
 name: Check & Release Beta
 
 on:
+  # Push to master will trigger a beta version release
   push:
     branches:
       - master
+  # A manual release via GitHub releases will trigger latest release
+  release:
+    types: [ published ]
+
+  env:
+    # Save info whether this is a latest or beta release for later use in jobs
+    RELEASE_TAG: $(if [ ${{ github.event_name }} = release ]; then echo latest; else echo beta; fi)
 
 jobs:
   # NPM install is done in a separate job and cached to speed up the following jobs.
@@ -95,17 +100,18 @@ jobs:
             node_modules
             build
           key: node-modules-${{ github.run_id }}-v${{ matrix.node-version }}
-        # Check version consistency and increment pre-release version number.
-      -
+      - # Check version consistency and increment pre-release version number for beta only.
         name: Bump pre-release version
+        if: env.RELEASE_TAG == 'beta'
         run: node ./.github/scripts/before-beta-release.js
       -
         name: Publish to NPM
-        run: NODE_AUTH_TOKEN=${{secrets.NPM_TOKEN}} npm publish --tag beta
-      -
+        run: NODE_AUTH_TOKEN=${{secrets.NPM_TOKEN}} npm publish --tag ${{ env.RELEASE_TAG }}
+      - # Latest version is tagged by the release process
         name: Tag Version
+        if: env.RELEASE_TAG == 'beta'
         run: |
-          git_tag=v`node -p "require('./package.json').version"`
+          git_tag=v`jq '.version'`
           git tag $git_tag
           git push origin $git_tag
       -
@@ -123,4 +129,4 @@ jobs:
           token: ${{ secrets.TRIGGER_DOCKER_IMAGE_BUILD_TOKEN }}
           repository: apify/apify-actor-docker
           event-type: build-beta
-          client-payload: '{ "apify_version": ${{ steps.versions.outputs.apify }}, "puppeteer_version": ${{ steps.versions.outputs.puppeteer }} }'
+          client-payload: '{ "tag": ${{ env.RELEASE_TAG }}, "apify_version": ${{ steps.versions.outputs.apify }}, "puppeteer_version": ${{ steps.versions.outputs.puppeteer }} }'
