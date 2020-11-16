@@ -9,9 +9,9 @@ on:
   release:
     types: [ published ]
 
-  env:
-    # Save info whether this is a latest or beta release for later use in jobs
-    RELEASE_TAG: $(if [ ${{ github.event_name }} = release ]; then echo latest; else echo beta; fi)
+env:
+  # Save info whether this is a latest or beta release for later use in jobs
+  RELEASE_TAG: $(if [ ${{ github.event_name }} = release ]; then echo latest; else echo beta; fi)
 
 jobs:
   # NPM install is done in a separate job and cached to speed up the following jobs.
