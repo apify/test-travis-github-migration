@@ -76,16 +76,19 @@ jobs:
           key: node-modules-${{ github.run_id }}-v${{ matrix.node-version }}
       - run: npm test
 
-  publish-npm:
+  deploy:
     needs: [lint, test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      -
+        uses: actions/checkout@v2
+      -
+        uses: actions/setup-node@v1
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org/
-      - name: Load Cache
+      -
+        name: Load Cache
         uses: actions/cache@v2
         with:
           path: |
@@ -93,8 +96,27 @@ jobs:
             build
           key: node-modules-${{ github.run_id }}-v${{ matrix.node-version }}
         # Check version consistency and increment pre-release version number.
-      - name: pre-release
+      -
+        name: Bump pre-release version
         run: node ./.github/scripts/before-beta-release.js
-      - run: npm publish --tag beta
+      -
+        name: Publish to NPM
+        run: npm publish --tag beta
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      -
+        name: Read Versions For Images
+        id: versions
+        run: |
+          apify=`cat ./package.json | jq '.version'`
+          echo "::set-output name=apify::$apify"
+          puppeteer=`cat ./package.json | jq '.optionalDependencies.puppeteer'`
+          echo "::set-output name=puppeteer::$puppeteer"
+      -
+        name: Trigger Docker Image Build
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.TRIGGER_DOCKER_IMAGE_BUILD_TOKEN }}
+          repository: apify/apify-actor-docker
+          event-type: build-beta
+          client-payload: '{"apifyVersion": "${{ steps.versions.outputs.apify }}", "sha": "${{ steps.versions.outputs.puppeteer }}"}'
