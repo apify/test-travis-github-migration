@@ -1,6 +1,6 @@
 {
   "name": "apify-test-travis-github-migration",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Just to test migration of SDK Travis scripts to GitHub Actions. Will delete afterwards.",
   "main": "build/index.js",
   "scripts": {
