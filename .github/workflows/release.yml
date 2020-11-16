@@ -151,6 +151,6 @@ jobs:
           client-payload: >
             {
               "tag": "${{ env.RELEASE_TAG }}",
-              "apify_version": ${{ steps.versions.outputs.apify }},
-              "puppeteer_version": ${{ steps.versions.outputs.puppeteer }}
+              "apify_version": "${{ steps.versions.outputs.apify }}",
+              "puppeteer_version": "${{ steps.versions.outputs.puppeteer }}"
             }
