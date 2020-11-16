@@ -117,4 +117,4 @@ jobs:
           token: ${{ secrets.TRIGGER_DOCKER_IMAGE_BUILD_TOKEN }}
           repository: apify/apify-actor-docker
           event-type: build-beta
-          client-payload: '{ "apifyVersion": ${{ steps.versions.outputs.apify }}, "puppeteerVersion": ${{ steps.versions.outputs.puppeteer }} }'
+          client-payload: '{ "apify_version": ${{ steps.versions.outputs.apify }}, "puppeteer_version": ${{ steps.versions.outputs.puppeteer }} }'
